@@ -122,6 +122,10 @@ python main.py -a vgg16_bn --lr 0.01 -b 16 D:\Dataset\Imagenet2012\Images
 python main.py -a vgg16_bn --lr 0.01 -b 16 --resume . --epochs 50 --start-epoch 35 --multiprocessing-distributed  D:\Dataset\Imagenet2012\Images
 ```
 
+```bash
+python main.py -a vgg16_bn --lr 0.01 -b 16 --resume model_best.pth.tar --epochs 50 --gpu 0  D:\Dataset\Imagenet2012\Images
+```
+
 
 ## Download the ImageNet dataset
 The ImageNet Large Scale Visual Recognition Challenge (ILSVRC) dataset has 1000 categories and 1.2 million images. The images do not need to be preprocessed or packaged in any database, but the validation images need to be moved into appropriate subfolders.
