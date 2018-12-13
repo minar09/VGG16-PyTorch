@@ -123,7 +123,7 @@ python main.py -a vgg16_bn --lr 0.01 -b 16 --resume . --epochs 50 --start-epoch 
 ```
 
 ```bash
-python main.py -a vgg16_bn --lr 0.01 -b 16 --resume model_best.pth.tar --epochs 50 --gpu 0  D:\Dataset\Imagenet2012\Images
+python main.py -a vgg16_bn --lr 0.001 -b 16 --resume model_best.pth.tar --epochs 40 --gpu 0  D:\Dataset\Imagenet2012\Images
 ```
 
 
