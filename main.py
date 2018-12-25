@@ -263,6 +263,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
     model.train()
 
     end = time.time()
+    train_results = []
+    
     for i, (input, target) in enumerate(train_loader):
         # measure data loading time
         data_time.update(time.time() - end)
@@ -300,6 +302,18 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
                    epoch, i, len(train_loader), batch_time=batch_time,
                    data_time=data_time, loss=losses, top1=top1, top5=top5))
 
+        if i % 80000 == 0 and i > 0:
+            temp = []
+            temp.append("Epoch:" + str(epoch))
+            temp.append("  Loss:" + str(losses.avg))
+            temp.append("  Top1 acc:" + str(top1.avg))
+            temp.append("  Top5 acc:" + str(top5.avg))
+            train_results.append(temp)
+                   
+    with open('train_results.txt', 'w') as file:
+        for error in train_results:
+            file.write("%i\n" % error)
+                   
 
 def validate(val_loader, model, criterion, args):
     batch_time = AverageMeter()
@@ -312,6 +326,8 @@ def validate(val_loader, model, criterion, args):
 
     with torch.no_grad():
         end = time.time()
+        val_results = []
+    
         for i, (input, target) in enumerate(val_loader):
             if args.gpu is not None:
                 input = input.cuda(args.gpu, non_blocking=True)
@@ -340,8 +356,20 @@ def validate(val_loader, model, criterion, args):
                        i, len(val_loader), batch_time=batch_time, loss=losses,
                        top1=top1, top5=top5))
 
+            if i % 3000 == 0 and i > 0:
+                temp = []
+                temp.append("Epoch:" + str(epoch))
+                temp.append("  Loss:" + str(losses.avg))
+                temp.append("  Top1 acc:" + str(top1.avg))
+                temp.append("  Top5 acc:" + str(top5.avg))
+                val_results.append(temp)
+
         print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
               .format(top1=top1, top5=top5))
+
+        with open('val_results.txt', 'w') as file:
+            for error in val_results:
+                file.write("%i\n" % error)
 
     return top1.avg
 
