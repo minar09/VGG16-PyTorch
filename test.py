@@ -20,8 +20,8 @@ import torchvision.datasets as datasets
 import torchvision.models as models
 
 model_names = sorted(name for name in models.__dict__
-    if name.islower() and not name.startswith("__")
-    and callable(models.__dict__[name]))
+                     if name.islower() and not name.startswith("__")
+                     and callable(models.__dict__[name]))
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 parser.add_argument('data', metavar='DIR',
@@ -29,8 +29,8 @@ parser.add_argument('data', metavar='DIR',
 parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
                     choices=model_names,
                     help='model architecture: ' +
-                        ' | '.join(model_names) +
-                        ' (default: resnet18)')
+                    ' | '.join(model_names) +
+                    ' (default: resnet18)')
 parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--epochs', default=90, type=int, metavar='N',
@@ -113,7 +113,8 @@ def main():
         args.world_size = ngpus_per_node * args.world_size
         # Use torch.multiprocessing.spawn to launch distributed processes: the
         # main_worker process function
-        mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
+        mp.spawn(main_worker, nprocs=ngpus_per_node,
+                 args=(ngpus_per_node, args))
     else:
         # Simply call main_worker function
         main_worker(args.gpu, ngpus_per_node, args)
@@ -154,7 +155,8 @@ def main_worker(gpu, ngpus_per_node, args):
             # DistributedDataParallel, we need to divide the batch size
             # ourselves based on the total number of GPUs we have
             args.batch_size = int(args.batch_size / ngpus_per_node)
-            model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu])
+            model = torch.nn.parallel.DistributedDataParallel(
+                model, device_ids=[args.gpu])
         else:
             model.cuda()
             # DistributedDataParallel will divide and allocate batch_size to all
@@ -192,32 +194,32 @@ def main_worker(gpu, ngpus_per_node, args):
         else:
             print("=> no checkpoint found at '{}'".format(args.resume))
     else:
-	    print("Please provide a valid checkpoint!")
+        print("Please provide a valid checkpoint!")
 
     cudnn.benchmark = True
 
     # Data loading code
     testdir = os.path.join(args.data, 'ILSVRC2012_img_test')
     data = make_dataset(testdir, testing_GT)
-	
-	# test on test set
-	acc1 = test(data, model, criterion, args)
-	
-	
+
+    # test on test set
+    acc1 = test(data, model, criterion, args)
+
+
 def make_dataset(dir, labels):
     data = []
-	
+
     images = os.path.listdir(dir)
     for i in len(images):
         d = os.path.join(dir, images[i])
-		t = labels[i]
+        t = labels[i]
 
         item = (path, class_to_idx[target])
         data.append(item)
 
     return data
 
-	
+
 def test(test_data, model, criterion, args):
     batch_time = AverageMeter()
     losses = AverageMeter()
@@ -254,8 +256,8 @@ def test(test_data, model, criterion, args):
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                       'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
                       'Acc@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
-                       i, len(test_loader), batch_time=batch_time, loss=losses,
-                       top1=top1, top5=top5))
+                          i, len(test_loader), batch_time=batch_time, loss=losses,
+                          top1=top1, top5=top5))
 
         print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
               .format(top1=top1, top5=top5))
@@ -265,6 +267,7 @@ def test(test_data, model, criterion, args):
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
+
     def __init__(self):
         self.reset()
 

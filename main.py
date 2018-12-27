@@ -20,8 +20,8 @@ import torchvision.datasets as datasets
 import torchvision.models as models
 
 model_names = sorted(name for name in models.__dict__
-    if name.islower() and not name.startswith("__")
-    and callable(models.__dict__[name]))
+                     if name.islower() and not name.startswith("__")
+                     and callable(models.__dict__[name]))
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
 parser.add_argument('data', metavar='DIR',
@@ -29,8 +29,8 @@ parser.add_argument('data', metavar='DIR',
 parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
                     choices=model_names,
                     help='model architecture: ' +
-                        ' | '.join(model_names) +
-                        ' (default: resnet18)')
+                    ' | '.join(model_names) +
+                    ' (default: resnet18)')
 parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
 parser.add_argument('--epochs', default=90, type=int, metavar='N',
@@ -107,7 +107,8 @@ def main():
         args.world_size = ngpus_per_node * args.world_size
         # Use torch.multiprocessing.spawn to launch distributed processes: the
         # main_worker process function
-        mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
+        mp.spawn(main_worker, nprocs=ngpus_per_node,
+                 args=(ngpus_per_node, args))
     else:
         # Simply call main_worker function
         main_worker(args.gpu, ngpus_per_node, args)
@@ -148,7 +149,8 @@ def main_worker(gpu, ngpus_per_node, args):
             # DistributedDataParallel, we need to divide the batch size
             # ourselves based on the total number of GPUs we have
             args.batch_size = int(args.batch_size / ngpus_per_node)
-            model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu])
+            model = torch.nn.parallel.DistributedDataParallel(
+                model, device_ids=[args.gpu])
         else:
             model.cuda()
             # DistributedDataParallel will divide and allocate batch_size to all
@@ -204,12 +206,14 @@ def main_worker(gpu, ngpus_per_node, args):
         ]))
 
     if args.distributed:
-        train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
+        train_sampler = torch.utils.data.distributed.DistributedSampler(
+            train_dataset)
     else:
         train_sampler = None
 
     train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=args.batch_size, shuffle=(train_sampler is None),
+        train_dataset, batch_size=args.batch_size, shuffle=(
+            train_sampler is None),
         num_workers=args.workers, pin_memory=True, sampler=train_sampler)
 
     val_loader = torch.utils.data.DataLoader(
@@ -242,13 +246,13 @@ def main_worker(gpu, ngpus_per_node, args):
         best_acc1 = max(acc1, best_acc1)
 
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
-                and args.rank % ngpus_per_node == 0):
+                                                    and args.rank % ngpus_per_node == 0):
             save_checkpoint({
                 'epoch': epoch + 1,
                 'arch': args.arch,
                 'state_dict': model.state_dict(),
                 'best_acc1': best_acc1,
-                'optimizer' : optimizer.state_dict(),
+                'optimizer': optimizer.state_dict(),
             }, is_best)
 
 
@@ -263,8 +267,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
     model.train()
 
     end = time.time()
-    train_results = []
-    
+
     for i, (input, target) in enumerate(train_loader):
         # measure data loading time
         data_time.update(time.time() - end)
@@ -299,21 +302,23 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
                   'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                   'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
                   'Acc@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
-                   epoch, i, len(train_loader), batch_time=batch_time,
-                   data_time=data_time, loss=losses, top1=top1, top5=top5))
+                      epoch, i, len(train_loader), batch_time=batch_time,
+                      data_time=data_time, loss=losses, top1=top1, top5=top5))
 
-        if i % 80000 == 0 and i > 0:
-            temp = []
-            temp.append("Epoch:" + str(epoch))
-            temp.append("  Loss:" + str(losses.avg))
-            temp.append("  Top1 acc:" + str(top1.avg))
-            temp.append("  Top5 acc:" + str(top5.avg))
-            train_results.append(temp)
-                   
-    with open('train_results.txt', 'w') as file:
-        for error in train_results:
-            file.write("%i\n" % error)
-                   
+    # Writing to log file
+    try:
+        with open('train_results.txt', 'w') as file:
+            file.write('Epoch: [{0}]\t'
+                       'Time {batch_time.avg:.3f}\t'
+                       'Data {data_time.avg:.3f}\t'
+                       'Loss {loss.avg:.4f}\t'
+                       'Acc@1 {top1.avg:.3f}\t'
+                       'Acc@5 {top5.avg:.3f}'.format(
+                           epoch, batch_time=batch_time,
+                           data_time=data_time, loss=losses, top1=top1, top5=top5))
+    except Exception as err:
+        print(err)
+
 
 def validate(val_loader, model, criterion, args):
     batch_time = AverageMeter()
@@ -326,8 +331,7 @@ def validate(val_loader, model, criterion, args):
 
     with torch.no_grad():
         end = time.time()
-        val_results = []
-    
+
         for i, (input, target) in enumerate(val_loader):
             if args.gpu is not None:
                 input = input.cuda(args.gpu, non_blocking=True)
@@ -353,23 +357,19 @@ def validate(val_loader, model, criterion, args):
                       'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                       'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
                       'Acc@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
-                       i, len(val_loader), batch_time=batch_time, loss=losses,
-                       top1=top1, top5=top5))
-
-            if i % 3000 == 0 and i > 0:
-                temp = []
-                temp.append("Epoch:" + str(epoch))
-                temp.append("  Loss:" + str(losses.avg))
-                temp.append("  Top1 acc:" + str(top1.avg))
-                temp.append("  Top5 acc:" + str(top5.avg))
-                val_results.append(temp)
+                          i, len(val_loader), batch_time=batch_time, loss=losses,
+                          top1=top1, top5=top5))
 
         print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
               .format(top1=top1, top5=top5))
 
-        with open('val_results.txt', 'w') as file:
-            for error in val_results:
-                file.write("%i\n" % error)
+        # Writing to log file
+        try:
+            with open('val_results.txt', 'w') as file:
+                file.write('Loss {loss.avg:.4f} * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'.format(
+                    loss=losses, top1=top1, top5=top5))
+        except Exception as err:
+            print(err)
 
     return top1.avg
 
@@ -382,6 +382,7 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
+
     def __init__(self):
         self.reset()
 

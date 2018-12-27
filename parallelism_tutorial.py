@@ -78,7 +78,9 @@ def data_parallel(module, input, device_ids, output_device=None):
 # Let’s look at a small example of implementing a network where part of it
 # is on the CPU and part on the GPU
 
+
 device = torch.device("cuda:0")
+
 
 class DistributedModel(nn.Module):
 
