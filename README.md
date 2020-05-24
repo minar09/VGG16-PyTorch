@@ -1,3 +1,6 @@
+## Disclaimer
+This is a modified repository from [PyTorch/examples/ImageNet](https://github.com/pytorch/examples/tree/master/imagenet). Please refer to the original repository for more details
+
 # ImageNet training in PyTorch
 
 This implements training of popular model architectures, such as ResNet, AlexNet, and VGG on the ImageNet dataset.
