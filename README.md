@@ -1,5 +1,5 @@
 ## Disclaimer
-This is a modified repository from [PyTorch/examples/ImageNet](https://github.com/pytorch/examples/tree/master/imagenet). Please refer to the original repository for more details
+This is a modified repository from [PyTorch/examples/ImageNet](https://github.com/pytorch/examples/tree/master/imagenet). Please refer to the original repository for more details.
 
 # ImageNet training in PyTorch
 
